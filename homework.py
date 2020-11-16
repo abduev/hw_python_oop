@@ -21,20 +21,19 @@ class Calculator:
 
 
 class Record:
-    def __init__(self, amount, comment, date=dt.datetime.now().date()):
+    def __init__(self, amount, comment, date=None):
         self.amount = amount
         self.comment = comment
         self.date = date
-        if isinstance(date, str):
+        if date is None:
+            self.date = dt.datetime.now().date()
+        else:
             self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
 
 
 class CashCalculator(Calculator):
     USD_RATE = 60.0
     EURO_RATE = 70.0
-
-    def __init__(self, limit):
-        super().__init__(limit)
 
     def get_today_cash_remained(self, currency):
         self.currency = currency
@@ -50,20 +49,15 @@ class CashCalculator(Calculator):
         elif cash_remained > 0:
             return ("На сегодня осталось "
                     f"{cash_remained} {currency_dict[currency][1]}")
-        else:
-            return ("Денег нет, держись: твой долг "
-                    f"- {abs(cash_remained)} {currency_dict[currency][1]}")
+        return ("Денег нет, держись: твой долг "
+                f"- {abs(cash_remained)} {currency_dict[currency][1]}")
 
 
 class CaloriesCalculator(Calculator):
-    def __init__(self, limit):
-        super().__init__(limit)
-
     def get_calories_remained(self):
         calories_eaten = self.get_today_stats()
         calories_available = self.limit - calories_eaten
         if calories_available > 0:
             return ("Сегодня можно съесть что-нибудь ещё, но с общей "
                     f"калорийностью не более {calories_available} кКал")
-        else:
-            return f"Хватит есть!"
+        return f"Хватит есть!"
